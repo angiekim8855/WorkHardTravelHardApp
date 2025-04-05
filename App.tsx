@@ -1,20 +1,58 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, Text, View, TouchableOpacity, TextInput } from "react-native";
+import { theme } from "./colors";
+import { useState } from "react";
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+    const [working, setWorking] = useState(true);
+    const work = () => setWorking(true);
+    const travel = () => setWorking(false);
+    const [text, setText] = useState("");
+
+    const onChangeText = (payload: any) => setText(payload);
+
+    return (
+        <View style={styles.container}>
+            <View style={styles.header}>
+                <StatusBar style="light" />
+                <TouchableOpacity onPress={work}>
+                    <Text style={{ ...styles.btnText, color: working ? "white" : theme.grey }}>Work</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={travel}>
+                    <Text style={{ ...styles.btnText, color: !working ? "white" : theme.grey }}>Travel</Text>
+                </TouchableOpacity>
+            </View>
+            <TextInput
+                value={text}
+                onChangeText={onChangeText}
+                placeholder={working ? "Add things to do" : "Where do you want to go?"}
+                style={styles.input}
+            />
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+    container: {
+        flex: 1,
+        backgroundColor: theme.bg,
+        paddingHorizontal: 20,
+    },
+    header: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginTop: 100,
+    },
+    btnText: {
+        fontSize: 30,
+        fontWeight: 600,
+    },
+    input: {
+        backgroundColor: "white",
+        marginTop: 20,
+        paddingVertical: 15,
+        paddingHorizontal: 15,
+        borderRadius: 30,
+        fontSize: 15,
+    },
 });
