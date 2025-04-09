@@ -1,14 +1,19 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, TouchableOpacity, TextInput } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, ScrollView } from "react-native";
 import { theme } from "./colors";
 import { useState } from "react";
+
+interface Todo {
+    text: string;
+    work: boolean;
+}
 
 export default function App() {
     const [working, setWorking] = useState(true);
     const work = () => setWorking(true);
     const travel = () => setWorking(false);
     const [text, setText] = useState("");
-    const [todos, setTodos] = useState({});
+    const [todos, setTodos] = useState<Record<string, Todo>>({});
 
     const onChangeText = (payload: any) => setText(payload);
     const addTodo = () => {
@@ -38,6 +43,13 @@ export default function App() {
                 placeholder={working ? "Add things to do" : "Where do you want to go?"}
                 style={styles.input}
             />
+            <ScrollView>
+                {Object.keys(todos).map((key: string) => (
+                    <View style={styles.todo} key={key}>
+                        <Text style={styles.todoText}>{todos[key].text}</Text>
+                    </View>
+                ))}
+            </ScrollView>
         </View>
     );
 }
@@ -59,10 +71,22 @@ const styles = StyleSheet.create({
     },
     input: {
         backgroundColor: "white",
-        marginTop: 20,
+        marginVertical: 20,
         paddingVertical: 15,
         paddingHorizontal: 15,
         borderRadius: 30,
         fontSize: 15,
+    },
+    todo: {
+        backgroundColor: theme.grey,
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        borderRadius: 10,
+        marginVertical: 10,
+    },
+    todoText: {
+        color: "white",
+        fontSize: 16,
+        fontWeight: 500,
     },
 });
