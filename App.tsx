@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, ScrollView } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, ScrollView, Alert } from "react-native";
 import { theme } from "./colors";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -47,6 +47,21 @@ export default function App() {
         await saveTodos(newTodos);
         setText("");
     };
+    const deleteTodo = (key: string) => {
+        Alert.alert("Delete To do", "Are you sure?", [
+            { text: "Cancel" },
+            {
+                text: "I'm sure",
+                onPress: () => {
+                    const newTodos = { ...todos };
+                    delete newTodos[key];
+                    setTodos(newTodos);
+                    saveTodos(newTodos);
+                },
+                style: "destructive",
+            },
+        ]);
+    };
 
     return (
         <View style={styles.container}>
@@ -72,6 +87,9 @@ export default function App() {
                     todos[key].working === working ? (
                         <View style={styles.todo} key={key}>
                             <Text style={styles.todoText}>{todos[key].text}</Text>
+                            <TouchableOpacity onPress={() => deleteTodo(key)}>
+                                <Text>❎</Text>
+                            </TouchableOpacity>
                         </View>
                     ) : null
                 )}
@@ -109,6 +127,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         borderRadius: 10,
         marginVertical: 10,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
     },
     todoText: {
         color: "white",
