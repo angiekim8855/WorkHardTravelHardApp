@@ -8,8 +8,16 @@ export default function App() {
     const work = () => setWorking(true);
     const travel = () => setWorking(false);
     const [text, setText] = useState("");
+    const [todos, setTodos] = useState({});
 
     const onChangeText = (payload: any) => setText(payload);
+    const addTodo = () => {
+        if (text === "") return;
+        // 입력한 텍스트를 투두에 추가
+        const newTodos = Object.assign({}, todos, { [Date.now()]: { text, work: working } });
+        setTodos(newTodos);
+        setText("");
+    };
 
     return (
         <View style={styles.container}>
@@ -24,7 +32,9 @@ export default function App() {
             </View>
             <TextInput
                 value={text}
+                returnKeyType="done"
                 onChangeText={onChangeText}
+                onSubmitEditing={addTodo}
                 placeholder={working ? "Add things to do" : "Where do you want to go?"}
                 style={styles.input}
             />
