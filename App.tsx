@@ -14,7 +14,7 @@ export default function App() {
     const addTodo = () => {
         if (text === "") return;
         // 입력한 텍스트를 투두에 추가
-        const newTodos = Object.assign({}, todos, { [Date.now()]: { text, work: working } });
+        const newTodos = { ...todos, [Date.now()]: { text, work: working } };
         setTodos(newTodos);
         setText("");
     };
