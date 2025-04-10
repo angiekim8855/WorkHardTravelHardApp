@@ -3,22 +3,30 @@ import { StyleSheet, Text, View, TouchableOpacity, TextInput, ScrollView, Alert 
 import { theme } from "./colors";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+// 1. 앱 재실행시, 마지막 상태의 Work 또는 Travel 기억하기
+// 2. Todo에 완료 기능 추가하기
+// 3. Todo에 수정 기능 추가하기
 interface Todo {
     text: string;
     working: boolean;
 }
 const STORAGE_KEY = "@toDos";
+const WORKING_STATE = "@working";
+
 export default function App() {
     const [working, setWorking] = useState(true);
-
-    useEffect(() => {
-        loadTodos();
-    }, []);
-    const work = () => setWorking(true);
-    const travel = () => setWorking(false);
     const [text, setText] = useState("");
     const [todos, setTodos] = useState<Record<string, Todo>>({});
+
+    useEffect(() => {
+        loadWorkingState();
+        loadTodos();
+    }, []);
+    useEffect(() => {
+        saveWorkingState();
+    }, [working]);
+    const work = () => setWorking(true);
+    const travel = () => setWorking(false);
     const saveTodos = async (newTodos: Record<string, Todo>) => {
         try {
             const jsonValue = JSON.stringify(newTodos);
@@ -62,7 +70,19 @@ export default function App() {
             },
         ]);
     };
-
+    const saveWorkingState = async () => {
+        await AsyncStorage.setItem(WORKING_STATE, JSON.stringify(working));
+    };
+    const loadWorkingState = async () => {
+        try {
+            const jsonValue = await AsyncStorage.getItem(WORKING_STATE);
+            if (jsonValue !== null) {
+                setWorking(JSON.parse(jsonValue));
+            }
+        } catch (e) {
+            console.log("Failed to load working state");
+        }
+    };
     return (
         <View style={styles.container}>
             <View style={styles.header}>
