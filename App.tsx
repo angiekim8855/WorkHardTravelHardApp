@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, ScrollView, Alert } from "react-native";
+import { Platform, StyleSheet, Text, View, TouchableOpacity, TextInput, ScrollView, Alert } from "react-native";
 import { theme } from "./colors";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -63,19 +63,29 @@ export default function App() {
         setText("");
     };
     const deleteTodo = (key: string) => {
-        Alert.alert("Delete To do", "Are you sure?", [
-            { text: "Cancel" },
-            {
-                text: "I'm sure",
-                onPress: () => {
-                    const newTodos = { ...todos };
-                    delete newTodos[key];
-                    setTodos(newTodos);
-                    saveTodos(newTodos);
+        if (Platform.OS === "web") {
+            const response = confirm("Are you sure to delete this to do?");
+            if (response) {
+                const newTodos = { ...todos };
+                delete newTodos[key];
+                setTodos(newTodos);
+                saveTodos(newTodos);
+            }
+        } else {
+            Alert.alert("Delete To do", "Are you sure?", [
+                { text: "Cancel" },
+                {
+                    text: "I'm sure",
+                    onPress: () => {
+                        const newTodos = { ...todos };
+                        delete newTodos[key];
+                        setTodos(newTodos);
+                        saveTodos(newTodos);
+                    },
+                    style: "destructive",
                 },
-                style: "destructive",
-            },
-        ]);
+            ]);
+        }
     };
     const saveWorkingState = async () => {
         await AsyncStorage.setItem(WORKING_STATE, JSON.stringify(working));
@@ -104,22 +114,36 @@ export default function App() {
     };
     const onChangeTodoText = (payload: string) => setEditText(payload);
     const updateTodos = (key: string) => {
-        editText
-            ? Alert.alert("Update To do", "Are you sure?", [
-                  { text: "Cancel" },
-                  {
-                      text: "I'm sure",
-                      onPress: () => {
-                          const newTodos = { ...todos };
-                          newTodos[key].text = editText;
-                          newTodos[key].editStatus = false;
-                          setTodos(newTodos);
-                          saveTodos(newTodos);
-                          setEditText("");
+        if (Platform.OS === "web") {
+            const response = confirm("Are you sure to savee this todo?");
+            if (response) {
+                if (editText) {
+                    const newTodos = { ...todos };
+                    newTodos[key].text = editText;
+                    newTodos[key].editStatus = false;
+                    setTodos(newTodos);
+                    saveTodos(newTodos);
+                    setEditText("");
+                } else alert("Please write some todo");
+            }
+        } else {
+            editText
+                ? Alert.alert("Update To do", "Are you sure?", [
+                      { text: "Cancel" },
+                      {
+                          text: "I'm sure",
+                          onPress: () => {
+                              const newTodos = { ...todos };
+                              newTodos[key].text = editText;
+                              newTodos[key].editStatus = false;
+                              setTodos(newTodos);
+                              saveTodos(newTodos);
+                              setEditText("");
+                          },
                       },
-                  },
-              ])
-            : Alert.alert("Alert", "Please write some todo");
+                  ])
+                : Alert.alert("Alert", "Please write some todo");
+        }
     };
     return (
         <View style={styles.container}>
