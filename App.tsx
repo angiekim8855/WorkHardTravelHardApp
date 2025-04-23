@@ -12,6 +12,7 @@ interface Todo {
     text: string;
     working: boolean;
     completed: boolean;
+    editStatus: boolean;
 }
 const STORAGE_KEY = "@toDos";
 const WORKING_STATE = "@working";
@@ -20,6 +21,8 @@ export default function App() {
     const [working, setWorking] = useState(true);
     const [text, setText] = useState("");
     const [completed, setCompleted] = useState(false);
+    const [editStatus, setEditStatus] = useState(false);
+    const [editText, setEditText] = useState("");
     const [todos, setTodos] = useState<Record<string, Todo>>({});
 
     useEffect(() => {
@@ -54,7 +57,7 @@ export default function App() {
     const addTodo = async () => {
         if (text === "") return;
         // 입력한 텍스트를 투두에 추가
-        const newTodos = { ...todos, [Date.now()]: { text, working, completed } };
+        const newTodos = { ...todos, [Date.now()]: { text, working, completed, editStatus } };
         setTodos(newTodos);
         await saveTodos(newTodos);
         setText("");
@@ -87,11 +90,36 @@ export default function App() {
             console.log("Failed to load working state");
         }
     };
-    const updateTodo = (key: string) => {
+    const completedTodo = (key: string) => {
         const newTodo = { ...todos };
         newTodo[key] = { ...newTodo[key], completed: !newTodo[key].completed };
         setTodos(newTodo);
         saveTodos(newTodo);
+    };
+    const updateEditStatus = (key: string) => {
+        const newTodo = { ...todos };
+        newTodo[key] = { ...newTodo[key], editStatus: !newTodo[key].editStatus };
+        setTodos(newTodo);
+        setEditText(newTodo[key].text);
+    };
+    const onChangeTodoText = (payload: string) => setEditText(payload);
+    const updateTodos = (key: string) => {
+        editText
+            ? Alert.alert("Update To do", "Are you sure?", [
+                  { text: "Cancel" },
+                  {
+                      text: "I'm sure",
+                      onPress: () => {
+                          const newTodos = { ...todos };
+                          newTodos[key].text = editText;
+                          newTodos[key].editStatus = false;
+                          setTodos(newTodos);
+                          saveTodos(newTodos);
+                          setEditText("");
+                      },
+                  },
+              ])
+            : Alert.alert("Alert", "Please write some todo");
     };
     return (
         <View style={styles.container}>
@@ -115,24 +143,52 @@ export default function App() {
             <ScrollView>
                 {Object.keys(todos).map((key: string) =>
                     todos[key].working === working ? (
-                        <View style={styles.todo} key={key}>
-                            <Text style={styles.todoText}>{todos[key].text}</Text>
-                            <View style={styles.todoBtn}>
-                                <TouchableOpacity>
-                                    <AntDesign name="edit" size={23} color="white" />
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => updateTodo(key)}>
-                                    {todos[key].completed ? (
-                                        <MaterialIcons name="check-box" size={24} color="white" />
-                                    ) : (
-                                        <MaterialIcons name="check-box-outline-blank" size={24} color="white" />
-                                    )}
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => deleteTodo(key)}>
-                                    <Text>❎</Text>
-                                </TouchableOpacity>
+                        todos[key].editStatus ? (
+                            <View style={{ ...styles.todo, backgroundColor: "white" }} key={key}>
+                                <TextInput
+                                    value={editText}
+                                    returnKeyType="done"
+                                    onChangeText={onChangeTodoText}
+                                    onSubmitEditing={() => updateTodos(key)}
+                                    style={styles.editInput}
+                                />
+                                <View style={styles.todoBtn}>
+                                    <TouchableOpacity onPress={() => updateTodos(key)}>
+                                        <Text>✅</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => updateEditStatus(key)}>
+                                        <Text>❌</Text>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
-                        </View>
+                        ) : (
+                            <View style={styles.todo} key={key}>
+                                <Text
+                                    style={
+                                        todos[key].completed
+                                            ? { ...styles.todoText, color: "grey", textDecorationLine: "line-through" }
+                                            : styles.todoText
+                                    }
+                                >
+                                    {todos[key].text}
+                                </Text>
+                                <View style={styles.todoBtn}>
+                                    <TouchableOpacity onPress={() => updateEditStatus(key)}>
+                                        <AntDesign name="edit" size={23} color={todos[key].completed ? "grey" : "white"} />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => completedTodo(key)}>
+                                        {todos[key].completed ? (
+                                            <MaterialIcons name="check-box" size={24} color="white" />
+                                        ) : (
+                                            <MaterialIcons name="check-box-outline-blank" size={24} color="white" />
+                                        )}
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => deleteTodo(key)}>
+                                        <Text>❎</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        )
                     ) : null
                 )}
             </ScrollView>
@@ -183,4 +239,5 @@ const styles = StyleSheet.create({
         gap: 10,
         alignItems: "center",
     },
+    editInput: {},
 });
