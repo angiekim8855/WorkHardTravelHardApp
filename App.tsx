@@ -3,12 +3,15 @@ import { StyleSheet, Text, View, TouchableOpacity, TextInput, ScrollView, Alert 
 import { theme } from "./colors";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import AntDesign from "@expo/vector-icons/AntDesign";
 // 1. 앱 재실행시, 마지막 상태의 Work 또는 Travel 기억하기
 // 2. Todo에 완료 기능 추가하기
 // 3. Todo에 수정 기능 추가하기
 interface Todo {
     text: string;
     working: boolean;
+    completed: boolean;
 }
 const STORAGE_KEY = "@toDos";
 const WORKING_STATE = "@working";
@@ -16,6 +19,7 @@ const WORKING_STATE = "@working";
 export default function App() {
     const [working, setWorking] = useState(true);
     const [text, setText] = useState("");
+    const [completed, setCompleted] = useState(false);
     const [todos, setTodos] = useState<Record<string, Todo>>({});
 
     useEffect(() => {
@@ -50,7 +54,7 @@ export default function App() {
     const addTodo = async () => {
         if (text === "") return;
         // 입력한 텍스트를 투두에 추가
-        const newTodos = { ...todos, [Date.now()]: { text, working } };
+        const newTodos = { ...todos, [Date.now()]: { text, working, completed } };
         setTodos(newTodos);
         await saveTodos(newTodos);
         setText("");
@@ -83,6 +87,12 @@ export default function App() {
             console.log("Failed to load working state");
         }
     };
+    const updateTodo = (key: string) => {
+        const newTodo = { ...todos };
+        newTodo[key] = { ...newTodo[key], completed: !newTodo[key].completed };
+        setTodos(newTodo);
+        saveTodos(newTodo);
+    };
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -107,9 +117,21 @@ export default function App() {
                     todos[key].working === working ? (
                         <View style={styles.todo} key={key}>
                             <Text style={styles.todoText}>{todos[key].text}</Text>
-                            <TouchableOpacity onPress={() => deleteTodo(key)}>
-                                <Text>❎</Text>
-                            </TouchableOpacity>
+                            <View style={styles.todoBtn}>
+                                <TouchableOpacity>
+                                    <AntDesign name="edit" size={23} color="white" />
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => updateTodo(key)}>
+                                    {todos[key].completed ? (
+                                        <MaterialIcons name="check-box" size={24} color="white" />
+                                    ) : (
+                                        <MaterialIcons name="check-box-outline-blank" size={24} color="white" />
+                                    )}
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => deleteTodo(key)}>
+                                    <Text>❎</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     ) : null
                 )}
@@ -155,5 +177,10 @@ const styles = StyleSheet.create({
         color: "white",
         fontSize: 16,
         fontWeight: 500,
+    },
+    todoBtn: {
+        flexDirection: "row",
+        gap: 10,
+        alignItems: "center",
     },
 });
