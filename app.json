@@ -1,39 +1,46 @@
 {
-  "expo": {
-    "name": "WorkHardTravelHardApp",
-    "slug": "WorkHardTravelHardApp",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#000000"
-    },
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#000000"
-      }
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "6d84f7d7-5bdc-4d32-825c-79d88686fc0a"
-      }
-    },
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/6d84f7d7-5bdc-4d32-825c-79d88686fc0a"
+    "expo": {
+        "name": "WorkHardTravelHardApp",
+        "slug": "WorkHardTravelHardApp",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/icon.png",
+        "userInterfaceStyle": "light",
+        "newArchEnabled": true,
+        "experiments": {
+            "baseUrl": "/WorkHardTravelHardApp"
+        },
+        "splash": {
+            "image": "./assets/splash-icon.png",
+            "resizeMode": "contain",
+            "backgroundColor": "#000000"
+        },
+        "ios": {
+            "supportsTablet": true,
+            "bundleIdentifier": "com.ameunji.WorkHardTravelHardApp",
+            "infoPlist": {
+                "ITSAppUsesNonExemptEncryption": false
+            }
+        },
+        "android": {
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/adaptive-icon.png",
+                "backgroundColor": "#000000"
+            }
+        },
+        "web": {
+            "favicon": "./assets/favicon.png"
+        },
+        "extra": {
+            "eas": {
+                "projectId": "6d84f7d7-5bdc-4d32-825c-79d88686fc0a"
+            }
+        },
+        "runtimeVersion": {
+            "policy": "appVersion"
+        },
+        "updates": {
+            "url": "https://u.expo.dev/6d84f7d7-5bdc-4d32-825c-79d88686fc0a"
+        }
     }
-  }
 }
